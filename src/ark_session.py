@@ -581,7 +581,7 @@ def write_diary_entry(workspace_path, callsign, session_id, time_range,
     sid_short = session_id[:8] if len(session_id) > 8 else session_id
 
     lines = []
-    lines.append(f"### {sid_short} | {time_range} | {branch} | {model}")
+    lines.append(f"### {callsign} | {time_range} | {branch} | {model}")
     if duration_min > 0:
         lines.append(f"**Duration**: {duration_min} min")
     if intent:
