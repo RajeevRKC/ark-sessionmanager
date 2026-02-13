@@ -89,7 +89,7 @@ The SessionStart hook injects this as additional context, so the new session can
 
 ## Hook Configuration Template
 
-For `~/.claude/settings.json`:
+For `~/.claude/settings.json`. Use `2>/dev/null` on macOS/Linux or `2>nul` on Windows:
 
 ```json
 {
@@ -99,7 +99,7 @@ For `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python ~/.claude/hooks/gsd-session-start.py 2>nul"
+            "command": "python ~/.claude/hooks/gsd-session-start.py 2>/dev/null"
           }
         ]
       }
@@ -109,7 +109,7 @@ For `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python ~/.claude/hooks/stop-notification.py 2>nul"
+            "command": "python ~/.claude/hooks/stop-notification.py 2>/dev/null"
           }
         ]
       }
@@ -119,7 +119,7 @@ For `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python ~/.claude/hooks/statusline.py 2>nul"
+            "command": "python ~/.claude/hooks/statusline.py 2>/dev/null"
           }
         ]
       }
@@ -129,7 +129,7 @@ For `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "python ~/.claude/hooks/pre-compact.py 2>nul"
+            "command": "python ~/.claude/hooks/pre-compact.py 2>/dev/null"
           }
         ]
       }

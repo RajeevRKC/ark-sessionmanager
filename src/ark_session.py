@@ -425,14 +425,13 @@ def detect_crashes():
             pid_alive = False
             if pid:
                 try:
-                    import subprocess
-                    result = subprocess.run(
-                        ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
-                        capture_output=True, text=True, timeout=3,
-                    )
-                    pid_alive = str(pid) in result.stdout
+                    # Cross-platform PID check
+                    os.kill(int(pid), 0)
+                    pid_alive = True
+                except (OSError, ProcessLookupError, PermissionError):
+                    pid_alive = False
                 except Exception:
-                    pass
+                    pass  # Can't check, assume dead
 
             if not pid_alive:
                 active[sid]["status"] = "crashed"
@@ -673,23 +672,29 @@ def _self_test():
     assert LOG_DIR.exists(), "Log dir not created"
     print("[PASS] Directory creation")
 
-    # Test dynamic workspace short code generation
-    cs1 = _resolve_workspace_short("D:/My-Applications/07-Carbon-Meth-Hub")
-    assert len(cs1) >= 2 and cs1 == cs1.upper(), f"Bad short: {cs1}"
-    print(f"[PASS] Dynamic short: 07-Carbon-Meth-Hub -> {cs1}")
-
-    cs2 = _resolve_workspace_short("D:/My-Applications/64-CORTEX-GUI")
-    print(f"[PASS] Dynamic short: 64-CORTEX-GUI -> {cs2}")
-
-    cs3 = _resolve_workspace_short("D:/My-Applications/70-GIS-Command-Center")
-    print(f"[PASS] Dynamic short: 70-GIS-Command-Center -> {cs3}")
+    # Test dynamic workspace short code generation (portable paths)
+    import tempfile
+    test_paths = {
+        "07-Carbon-Meth-Hub": "CMH",
+        "64-CORTEX-GUI": "CG",
+        "70-GIS-Command-Center": "GCC",
+        "100-Aarksee-Component-Repository": "ACR",
+        "my-project": "MP",
+    }
+    for dirname, expected in test_paths.items():
+        # Use os.path.join for platform-safe paths
+        test_path = os.path.join(tempfile.gettempdir(), dirname)
+        short = _resolve_workspace_short(test_path)
+        assert short == expected, f"Expected {expected}, got {short} for {dirname}"
+        print(f"[PASS] Dynamic short: {dirname} -> {short}")
 
     cs4 = _resolve_workspace_short(os.path.expanduser("~"))
     assert cs4 == "CMD", f"Expected CMD, got {cs4}"
     print(f"[PASS] Home dir -> {cs4}")
 
-    # Test callsign generation
-    callsign = get_callsign("a3f7b2c1", "D:/My-Applications/07-Carbon-Meth-Hub")
+    # Test callsign generation (portable)
+    test_cwd = os.path.join(tempfile.gettempdir(), "07-Carbon-Meth-Hub")
+    callsign = get_callsign("a3f7b2c1", test_cwd)
     assert "-a3f7" in callsign, f"Bad callsign: {callsign}"
     print(f"[PASS] Callsign: {callsign}")
 
